@@ -19,7 +19,7 @@ public class ConfigOptions {
 
     protected ConfigOptions(ConfigUtils configInstance, Boolean fillFile) throws IOException {
         ConfigOptions.configInstance = configInstance;
-        if(fillFile.equals(true)) {
+        if(fillFile.equals(true)) {;
             setDefaults(ConfigUtils.cfgTemplate);
         }
     }

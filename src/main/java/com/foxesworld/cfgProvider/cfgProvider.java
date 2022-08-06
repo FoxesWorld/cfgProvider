@@ -26,7 +26,7 @@ public class cfgProvider {
     private final Boolean externalFile;
 
     /*CONSTANTS*/
-    private final static Map CFG = readJsonCfg(cfgProvider.class.getClassLoader().getResourceAsStream("Conf.json"));
+    private final static Map CFG = readJsonCfg(cfgProvider.class.getClassLoader().getResourceAsStream("assets/cfg/cfgRoot.json"));
     private final static String baseDirConst = getWorkdir((Integer) CFG.get("baseDirIndex"));
     public final static String homeDirConst = (String) CFG.get("homeDir");
     private final String tplBaseDirConst = (String) CFG.get("tplBaseDir");

@@ -1,6 +1,6 @@
 {
     "baseDirIndex": 1,
     "homeDir": "FoxesWorld",
-    "tplBaseDir": "",
+    "tplBaseDir": "assets/cfg/",
     "cfgExportDir": "config/"
 }

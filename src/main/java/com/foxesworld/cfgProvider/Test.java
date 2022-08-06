@@ -12,7 +12,7 @@ public class Test {
     private static Map testMap = null;
 
     public static void main(String[] args) {
-        test = new cfgProvider("test.json", false);
+        test = new cfgProvider("test.json", true);
         testMap = test.cfgMaps.get("test");
         System.out.println(testMap);
     }
