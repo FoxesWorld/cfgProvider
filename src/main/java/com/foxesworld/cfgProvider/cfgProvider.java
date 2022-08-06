@@ -78,7 +78,7 @@ public class cfgProvider {
         switch (index) {
             case 1:
                 //In user's HOMEDIR
-                path = System.getProperty("user.home", "") + File.separator;
+                path = System.getProperty("user.home", "");
                 break;
 
             case 2:
