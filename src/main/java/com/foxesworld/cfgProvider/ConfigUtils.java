@@ -11,7 +11,6 @@ import java.io.InputStream;
 import java.util.HashMap;
 
 /**
- *
  * @author AidenFox
  */
 public abstract class ConfigUtils {
@@ -29,17 +28,6 @@ public abstract class ConfigUtils {
         ConfigUtils.classFullPath = fullPath;
         ConfigUtils.cfgTemplate = cfgTemplate;
         this.load();
-    }
-
-    protected Boolean isCached() {
-        return cached;
-    }
-
-    protected void setCached(Boolean cached) {
-        this.cached = cached;
-        if (cached.equals(false)) {
-            cache = null;
-        }
     }
 
     private void load() {
@@ -102,88 +90,6 @@ public abstract class ConfigUtils {
             }
         }
         return result;
-    }
-
-    protected String getPropertyString(String property) {
-        try {
-            if (cached) {
-                return cache.get(property);
-            } else {
-                HashMap<String, String> contents = loadHashMap(classFullPath);
-                return contents.get(property);
-            }
-        } catch (Exception e) {
-        }
-        return null;
-    }
-
-    protected Integer getPropertyInteger(String property) {
-        try {
-            if (this.cached) {
-                return Integer.parseInt(cache.get(property));
-            } else {
-                HashMap<String, String> contents = loadHashMap(classFullPath);
-                return Integer.parseInt(contents.get(property));
-            }
-        } catch (Exception e) {
-        }
-        return null;
-    }
-
-    protected Boolean getPropertyBoolean(String property) {
-        try {
-            String result;
-            if (this.cached) {
-                result = this.cache.get(property);
-            } else {
-                HashMap<String, String> contents = this.loadHashMap(classFullPath);
-                result = contents.get(property);
-            }
-            if (result != null && result.equalsIgnoreCase("true")) {
-                return true;
-            } else {
-                return false;
-            }
-        } catch (Exception e) {
-        }
-        return null;
-    }
-
-    protected Double getPropertyDouble(String property) {
-        try {
-            String result;
-            if (cached) {
-                result = cache.get(property);
-            } else {
-                HashMap<String, String> contents = this.loadHashMap(classFullPath);
-                result = contents.get(property);
-            }
-            if (!result.contains("")) {
-                result += ".0";
-            }
-            return Double.parseDouble(result);
-        } catch (Exception e) {
-        }
-        return null;
-    }
-
-    protected Boolean checkProperty(String key) {
-        String check;
-        try {
-            if (cached) {
-                check = cache.get(key);
-            } else {
-                HashMap<String, String> contents = this.loadHashMap(classFullPath);
-                check = contents.get(key);
-            }
-            if (check != null) {
-                return true;
-            }
-        } catch (Exception e) {
-            return false;
-        }
-
-        return false;
     }
 
     private void flush(HashMap<Integer, String> newContents) {
@@ -251,46 +157,92 @@ public abstract class ConfigUtils {
         flush(contents);
     }
 
-    protected void put(String property, Object obj, Integer line) {
-        HashMap<Integer, String> contents = this.getAllFileContents();
-        if (line >= contents.size() + 1) {
-            return;
-        }
-        HashMap<Integer, String> newContents = new HashMap<>();
-        for (int i = 1; i < line; i++) {
-            newContents.put(i, contents.get(i));
-        }
-        newContents.put(line, property + ": " + obj.toString());
-        for (int i = line; i <= contents.size(); i++) {
-            newContents.put(i + 1, contents.get(i));
-        }
-        flush(newContents);
-    }
-
-    protected void changeProperty(String property, Object obj) {
-        HashMap<Integer, String> contents = this.getAllFileContents();
-        if ((contents == null)) {
-            return;
-        }
-        for (int i = 1; i <= contents.size(); i++) {
-            if (contents.get(i) == null) {
-                continue;
-            }
-            String check = contents.get(i);
-            if (check.startsWith(property)) {
-                check = check.replace(property, "");
-                if (!(check.startsWith(": "))) {
-                    continue;
-                }
-                contents.remove(i);
-                contents.put(i, property + ": " + obj.toString());
-            }
-        }
-        this.flush(contents);
-    }
-
     protected Integer getLineCount() {
         HashMap<Integer, String> contents = getAllFileContents();
         return contents.size();
+    }
+
+    /* GETTING PROPERTY */
+
+    protected Boolean checkProperty(String key) {
+        String check;
+        try {
+            if (cached) {
+                check = cache.get(key);
+            } else {
+                HashMap<String, String> contents = this.loadHashMap(classFullPath);
+                check = contents.get(key);
+            }
+            if (check != null) {
+                return true;
+            }
+        } catch (Exception e) {
+            return false;
+        }
+
+        return false;
+    }
+
+    protected String getPropertyString(String property) {
+        try {
+            if (cached) {
+                return cache.get(property);
+            } else {
+                HashMap<String, String> contents = loadHashMap(classFullPath);
+                return contents.get(property);
+            }
+        } catch (Exception ignored) {
+        }
+        return null;
+    }
+
+    protected Integer getPropertyInteger(String property) {
+        try {
+            if (this.cached) {
+                return Integer.parseInt(cache.get(property));
+            } else {
+                HashMap<String, String> contents = loadHashMap(classFullPath);
+                return Integer.parseInt(contents.get(property));
+            }
+        } catch (Exception ignored) {
+        }
+        return null;
+    }
+
+    protected Boolean getPropertyBoolean(String property) {
+        try {
+            String result;
+            if (this.cached) {
+                result = this.cache.get(property);
+            } else {
+                HashMap<String, String> contents = this.loadHashMap(classFullPath);
+                result = contents.get(property);
+            }
+            if (result != null && result.equalsIgnoreCase("true")) {
+                return true;
+            } else {
+                return false;
+            }
+        } catch (Exception ignored) {
+        }
+        return null;
+    }
+    /*WIP*/
+    protected Double getPropertyDouble(String property) {
+        try {
+            String result;
+            if (cached) {
+                result = cache.get(property);
+            } else {
+                HashMap<String, String> contents = this.loadHashMap(classFullPath);
+                result = contents.get(property);
+            }
+            if (!result.contains("")) {
+                result += ".0";
+            }
+            return Double.parseDouble(result);
+        } catch (Exception ignored) {
+        }
+        return null;
     }
 }

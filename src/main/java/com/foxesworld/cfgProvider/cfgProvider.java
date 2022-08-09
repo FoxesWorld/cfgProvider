@@ -12,6 +12,7 @@ import java.net.URLClassLoader;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.jar.Attributes;
 import java.util.jar.Manifest;
 
@@ -25,7 +26,7 @@ public class cfgProvider {
     private final String cfgTemplate;
     private final Boolean externalFile;
 
-    /*CONSTANTS*/
+    /*ROOT cfg*/
     private final static Map CFG = readJsonCfg(cfgProvider.class.getClassLoader().getResourceAsStream("assets/cfg/cfgRoot.json"));
     private final static String baseDirConst = getWorkdir((Integer) CFG.get("baseDirIndex"));
     public final static String homeDirConst = (String) CFG.get("homeDir");
@@ -51,18 +52,19 @@ public class cfgProvider {
         String cfgFilePath = this.tplBaseDirConst + template;
         String cfgName = template.split("\\.")[0];
         Map<String, Object> configLines = new HashMap<>();
+        String readNote = "Reading from";
         if (external.equals(true)) {
             File fullFilePath = new File(GAMEFULLPATH + File.separator + cfgExportDirConst + File.separator + template.split("\\.")[0] + ".cfg");
             try {
                 ConfigUtils config = new ConfigUtils(fullFilePath, cfgFilePath) {
                 };
                 ConfigOptions cfo = new ConfigOptions(config, true);
-                System.out.println("    - Reading `" + cfgName + "` from external storage " + fullFilePath);
+                readNote = "    - Reading `" + cfgName + "` from external storage " + fullFilePath;
                 configLines = loadHashMap(fullFilePath);
-            } catch (IOException ex) {
+            } catch (IOException ignored) {
             }
         } else {
-            System.out.println("    - Reading `" + cfgName + "` from local storage " + cfgFilePath);
+            readNote = "    - Reading `" + cfgName + "` from local storage " + cfgFilePath;
             configLines = cfgProvider.readJsonCfg(cfgProvider.class.getClassLoader().getResourceAsStream(cfgFilePath));
         }
         if (configLines.get("debug") != null) {
@@ -70,6 +72,7 @@ public class cfgProvider {
                 cfgProvider.DEBUG = true;
             }
         }
+        System.out.println(readNote);
         cfgProvider.cfgMaps.put(cfgName, configLines);
     }
 
@@ -82,7 +85,7 @@ public class cfgProvider {
                 break;
 
             case 2:
-                //On user's SYSTEMDRIVE
+                //On user's SYSTEM-DRIVE
                 path = System.getenv("SYSTEMDRIVE");
                 break;
 
@@ -95,14 +98,14 @@ public class cfgProvider {
         return path;
     }
 
-    private static HashMap<String, Object> readJsonCfg(InputStream is) {
+    protected static HashMap<String, Object> readJsonCfg(InputStream is) {
         HashMap<String, Object> map = null;
         try {
             ObjectMapper mapper = new ObjectMapper();
             TypeReference<HashMap<String, Object>> typeRef = new TypeReference<HashMap<String, Object>>() {
             };
             map = mapper.readValue(is, typeRef);
-        } catch (IOException ex) {
+        } catch (IOException ignored) {
         }
 
         return map;
@@ -110,12 +113,12 @@ public class cfgProvider {
 
     private HashMap<String, Object> loadHashMap(File cfgFile) {
         HashMap<String, Object> result = new HashMap<>();
-        BufferedReader br = null;
-        try {
-            br = new BufferedReader(new FileReader(cfgFile));
+        try (BufferedReader br = new BufferedReader(new FileReader(cfgFile))) {
             String line;
             while ((line = br.readLine()) != null) {
-                if ((line.isEmpty()) || (line.startsWith("#")) || (!line.contains(": "))) {
+                if (line.startsWith("#")) {
+                    continue;
+                } else if (!line.contains(": ")) {
                     continue;
                 }
                 String[] args = line.split(": ");
@@ -125,27 +128,8 @@ public class cfgProvider {
                 }
                 result.put(args[0], args[1]);
             }
-        } catch (IOException ex) {
-        } finally {
-
-            try {
-                br.close();
-            } catch (IOException e) {
-            }
+        } catch (IOException ignored) {
         }
         return result;
-    }
-
-    private String getVersion() {
-        Attributes attr = null;
-        try {
-            URLClassLoader cl = (URLClassLoader) cfgProvider.class.getClassLoader();
-            URL url = cl.findResource("META-INF/MANIFEST.MF");
-            Manifest manifest = new Manifest(url.openStream());
-            attr = manifest.getMainAttributes();
-            System.out.println(attr.values());
-        } catch (IOException ex) {
-        }
-        return attr.getValue("Implementation-Version");
     }
 }

@@ -1,16 +1,11 @@
 package com.foxesworld.cfgProvider;
 
 /**
- *
  * @author AidenFox
  */
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.awt.Color;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Map;
 
 public class ConfigOptions {
@@ -23,30 +18,28 @@ public class ConfigOptions {
             setDefaults(ConfigUtils.cfgTemplate);
         }
     }
-    
-    public static HashMap<String, Object> readJsonCfg(InputStream is){
-        HashMap<String, Object> map = null;
-        try {
-            ObjectMapper mapper = new ObjectMapper();
-            TypeReference<HashMap<String, Object>> typeRef = new TypeReference<HashMap<String, Object>>() {
-            };
-            map = mapper.readValue(is, typeRef);
-        } catch (IOException ex) {}
-        return map;
-    }
 
-    private static void setDefaults(String template) throws IOException {
+    private static void setDefaults(String template) {
         if (configInstance.getLineCount() <= 0) {
             System.out.println("    - Filling " + ConfigUtils.classFullPath + " file, with " + ConfigUtils.cfgTemplate + " contents");
         }
-        for (Map.Entry<String, Object> entry : readJsonCfg(ConfigOptions.class.getClassLoader().getResourceAsStream(template)).entrySet()) {
+        for (Map.Entry<String, Object> entry : cfgProvider.readJsonCfg(ConfigOptions.class.getClassLoader().getResourceAsStream(template)).entrySet()) {
             String key = entry.getKey();
             Object value = entry.getValue();
             setProperty(key, value);
         }
         setProperty("created", new Date());
     }
-    
+
+    protected static void setProperty(String key, Object value) {
+        if (!configInstance.checkProperty(key) || configInstance.getPropertyString(key) == null) {
+            configInstance.put(key, value);
+            System.out.println("    - Recording a missing key `" + key + "` with value `" + value + "`");
+        }
+    }
+
+    //Useful Methods
+
     public static Color HexToColor(String hex) {
         hex = hex.replace("#", "");
         switch (hex.length()) {
@@ -62,7 +55,7 @@ public class ConfigOptions {
                         Integer.valueOf(hex.substring(4, 6), 16),
                         Integer.valueOf(hex.substring(6, 8), 16));
         }
-        return new Color(0,0,0);
+        return new Color(49, 189, 157);
     }
 
     public static Object getProperty(String key, String type) {
@@ -86,12 +79,5 @@ public class ConfigOptions {
             return false;
         }
         return property;
-    }
-
-    protected static void setProperty(String key, Object value) {
-        if (!configInstance.checkProperty(key) || configInstance.getPropertyString(key) == null) {
-            configInstance.put(key, value);
-            //LOG.info("  - Recording a missing key `" + key + "` with value `" + value + "`");
-        }
     }
 }

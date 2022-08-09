@@ -3,7 +3,6 @@ package com.foxesworld.cfgProvider;
 import java.util.Map;
 
 /**
- *
  * @author AidenFox
  */
 public class Test {
