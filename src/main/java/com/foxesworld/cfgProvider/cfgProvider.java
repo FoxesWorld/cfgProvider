@@ -7,14 +7,11 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URL;
-import java.net.URLClassLoader;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
-import java.util.jar.Attributes;
-import java.util.jar.Manifest;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -35,6 +32,7 @@ public class cfgProvider {
 
     /*ENVIRONMENT PATHs*/
     public final static String GAMEFULLPATH = baseDirConst + File.separator + cfgProvider.homeDirConst + File.separator;
+    public static String readNote;
     public static final Integer MONTH = Calendar.getInstance().get(Calendar.MONTH) + 1;
     public static String PROTOCOL;
     public static String HOST;
@@ -46,33 +44,42 @@ public class cfgProvider {
     public static Map<String, Object> cfgContent = new HashMap<>();
     public static Map<String, Map> cfgMaps = new HashMap<>();
 
-    public cfgProvider(String template, Boolean external) {
+    public cfgProvider(String template, Boolean external, String... args) {
         this.cfgTemplate = template;
         this.externalFile = external;
-        String cfgFilePath = this.tplBaseDirConst + template;
+        String inputCfgPath = this.tplBaseDirConst + template;
         String cfgName = template.split("\\.")[0];
+        String filePath = GAMEFULLPATH + File.separator + cfgExportDirConst + File.separator + template.split("\\.")[0] + ".cfg";
         Map<String, Object> configLines = new HashMap<>();
-        String readNote = "Reading from";
+         Map<String, Object> cfgFileContents = configLines = readJsonCfg(cfgProvider.class.getClassLoader().getResourceAsStream(inputCfgPath));
         if (external.equals(true)) {
-            File fullFilePath = new File(GAMEFULLPATH + File.separator + cfgExportDirConst + File.separator + template.split("\\.")[0] + ".cfg");
-            try {
-                ConfigUtils config = new ConfigUtils(fullFilePath, cfgFilePath) {
-                };
-                ConfigOptions cfo = new ConfigOptions(config, true);
-                readNote = "    - Reading `" + cfgName + "` from external storage " + fullFilePath;
-                configLines = loadHashMap(fullFilePath);
-            } catch (IOException ignored) {
+            
+            File fullFilePath = new File(filePath);
+            if(fullFilePath.exists()) {
+                 readNote = "    - Reading `" + cfgName + "` from external storage " + fullFilePath;
+            } else {
+                
+                 readNote = "    - Creating `" + cfgName + "` from inputStream " + fullFilePath;
+                 JsonWriter jsonWriter = new JsonWriter(new File(filePath), cfgFileContents);
+                 
             }
+            configLines = readJsonCfg(new File(filePath));
+
         } else {
-            readNote = "    - Reading `" + cfgName + "` from local storage " + cfgFilePath;
-            configLines = cfgProvider.readJsonCfg(cfgProvider.class.getClassLoader().getResourceAsStream(cfgFilePath));
+            readNote = "    - Reading `" + cfgName + "` from inputStream " + inputCfgPath;
+            configLines = cfgFileContents;
+        
         }
-        if (configLines.get("debug") != null) {
-            if ("true".equals(configLines.get("debug").toString())) {
-                cfgProvider.DEBUG = true;
-            }
-        }
-        System.out.println(readNote);
+        
+                if (configLines.get("debug") != null) {
+                    if ("true".equals(configLines.get("debug").toString())) {
+                        cfgProvider.DEBUG = true;
+                    }
+                System.out.println(readNote);
+                }
+        
+        
+
         cfgProvider.cfgMaps.put(cfgName, configLines);
     }
 
@@ -110,26 +117,18 @@ public class cfgProvider {
 
         return map;
     }
-
-    private HashMap<String, Object> loadHashMap(File cfgFile) {
-        HashMap<String, Object> result = new HashMap<>();
-        try (BufferedReader br = new BufferedReader(new FileReader(cfgFile))) {
-            String line;
-            while ((line = br.readLine()) != null) {
-                if (line.startsWith("#")) {
-                    continue;
-                } else if (!line.contains(": ")) {
-                    continue;
-                }
-                String[] args = line.split(": ");
-                if (args.length < 2) {
-                    result.put(args[0], null);
-                    continue;
-                }
-                result.put(args[0], args[1]);
-            }
-        } catch (IOException ignored) {
+    
+    protected static HashMap<String, Object> readJsonCfg(File path) {
+        HashMap<String, Object> map = null;
+        ObjectMapper mapper = new ObjectMapper();
+        TypeReference<HashMap<String, Object>> typeRef = new TypeReference<HashMap<String, Object>>() {
+        };
+        try {
+            map = mapper.readValue(path, typeRef);
+        } catch (IOException ex) {
+            Logger.getLogger(cfgProvider.class.getName()).log(Level.SEVERE, null, ex);
         }
-        return result;
+
+        return map;
     }
 }
