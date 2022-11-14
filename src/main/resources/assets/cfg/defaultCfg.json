@@ -3,5 +3,6 @@
     "homeDir": "FoxesColonisation",
     "tplBaseDir": "assets/cfg/",
     "cfgExportDir": "config/",
-    "debug": true
+    "cfgExtension": ".cfg",
+    "debug": false
 }

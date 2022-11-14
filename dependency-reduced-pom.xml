@@ -4,7 +4,7 @@
   <groupId>com.foxesworld.cfgProvider</groupId>
   <artifactId>cfgProvider</artifactId>
   <name>cfgProvider</name>
-  <version>1.3.2-Release</version>
+  <version>1.3.3-Release</version>
   <build>
     <plugins>
       <plugin>

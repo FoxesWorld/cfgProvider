@@ -19,20 +19,19 @@ public class cfgProvider {
 
 
     /*ROOT cfg*/
-    private final static Map defaultConfig = readJsonCfg(cfgProvider.class.getClassLoader().getResourceAsStream("assets/cfg/cfgRoot.json"));
-    private static String baseDirPath = getWorkdir((Integer) defaultConfig.get("baseDirIndex"));
-    private static String homeDirName = (String) defaultConfig.get("homeDir");
-    private static String defaultConfFilesDir = (String) defaultConfig.get("tplBaseDir");
-    private static String cfgExportDirName = (String) defaultConfig.get("cfgExportDir");
-    private static Boolean debug = false;
+    private final static Map defaultConfig = readJsonCfg(cfgProvider.class.getClassLoader().getResourceAsStream("assets/cfg/defaultCfg.json"));
+    
+        private static String baseDirPath = getWorkdir((Integer) defaultConfig.get("baseDirIndex"));
+        private static String homeDirName = (String) defaultConfig.get("homeDir");
+        private static String defaultConfFilesDir = (String) defaultConfig.get("tplBaseDir");
+        private static String cfgFileExtension = (String) defaultConfig.get("cfgExtension");
+        private static String cfgExportDirName = (String) defaultConfig.get("cfgExportDir");
+        private static Boolean debug = (Boolean) defaultConfig.get("debug");
 
     /*ENVIRONMENT PATHs*/
     public final static String GAMEFULLPATH = baseDirPath + File.separator + cfgProvider.homeDirName + File.separator;
-    public static String readNote;
-    public static final Integer MONTH = Calendar.getInstance().get(Calendar.MONTH) + 1;
-    public static String PROTOCOL;
-    public static String HOST;
-    public static String SITELOC;
+    private static String readNote;
+    private static final Integer MONTH = Calendar.getInstance().get(Calendar.MONTH) + 1;
 
     /*OUTPUT*/
     public static Map<String, Object> cfgContent = new HashMap<>();
@@ -115,26 +114,38 @@ public class cfgProvider {
     }
     
     private static String getFileAbsolutePath(String cfgName) {
-        return GAMEFULLPATH + File.separator + cfgExportDirName + File.separator + cfgName + ".cfg";
+        return GAMEFULLPATH + File.separator + cfgExportDirName + File.separator + cfgName + cfgFileExtension;
     }
     
-    public void setHomeDir(String homeDir){
+    public static void setHomeDir(String homeDir){
         cfgProvider.homeDirName = homeDir;
     }
     
-    public void setBaseDirPathIndex(int index){
+    public static void setBaseDirPathIndex(int index){
         cfgProvider.baseDirPath = getWorkdir(index);
     }
     
-    public void setDefaultConfFilesDir(String directory) {
+    public static void setDefaultConfFilesDir(String directory) {
         cfgProvider.defaultConfFilesDir = directory;
     }
     
-    public void setCfgExportDirName(String dirName) {
+    public static void setCfgFileExtension(String extension) {
+        cfgProvider.cfgFileExtension = extension;
+    }
+    
+    public static void setCfgExportDirName(String dirName) {
         cfgProvider.cfgExportDirName = dirName;
     }
     
-    public void setDebug(Boolean debug){
+    public static void setDebug(Boolean debug){
         cfgProvider.debug = debug;
+    }
+    
+    public static String getReadNote(){
+        return readNote;
+    }
+    
+    public static Integer getMonth() {
+        return MONTH;
     }
 }

@@ -22,9 +22,7 @@ public class Test {
            inputArray = testMap.get(inputArrName);
              System.out.println(testMap.get(inputArrName));
          }
-         System.out.println(cfgProvider.readNote);
-         
-
+         System.out.println(cfgProvider.getReadNote());
     }
 
 }
