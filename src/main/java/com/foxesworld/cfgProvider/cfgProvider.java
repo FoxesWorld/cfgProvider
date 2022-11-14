@@ -2,9 +2,7 @@ package com.foxesworld.cfgProvider;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Calendar;
@@ -19,66 +17,50 @@ import java.util.logging.Logger;
  */
 public class cfgProvider {
 
-    /*INPUT*/
-    private final String cfgTemplate;
-    private final Boolean externalFile;
 
     /*ROOT cfg*/
-    private final static Map CFG = readJsonCfg(cfgProvider.class.getClassLoader().getResourceAsStream("assets/cfg/cfgRoot.json"));
-    private final static String baseDirConst = getWorkdir((Integer) CFG.get("baseDirIndex"));
-    public final static String homeDirConst = (String) CFG.get("homeDir");
-    private final String tplBaseDirConst = (String) CFG.get("tplBaseDir");
-    private final String cfgExportDirConst = (String) CFG.get("cfgExportDir");
+    private final static Map defaultConfig = readJsonCfg(cfgProvider.class.getClassLoader().getResourceAsStream("assets/cfg/cfgRoot.json"));
+    private static String baseDirPath = getWorkdir((Integer) defaultConfig.get("baseDirIndex"));
+    private static String homeDirName = (String) defaultConfig.get("homeDir");
+    private static String defaultConfFilesDir = (String) defaultConfig.get("tplBaseDir");
+    private static String cfgExportDirName = (String) defaultConfig.get("cfgExportDir");
+    private static Boolean debug = false;
 
     /*ENVIRONMENT PATHs*/
-    public final static String GAMEFULLPATH = baseDirConst + File.separator + cfgProvider.homeDirConst + File.separator;
+    public final static String GAMEFULLPATH = baseDirPath + File.separator + cfgProvider.homeDirName + File.separator;
     public static String readNote;
     public static final Integer MONTH = Calendar.getInstance().get(Calendar.MONTH) + 1;
     public static String PROTOCOL;
     public static String HOST;
     public static String SITELOC;
 
-    public static Boolean DEBUG = false;
-
     /*OUTPUT*/
     public static Map<String, Object> cfgContent = new HashMap<>();
     public static Map<String, Map> cfgMaps = new HashMap<>();
 
     public cfgProvider(String template, Boolean external, String... args) {
-        this.cfgTemplate = template;
-        this.externalFile = external;
-        String inputCfgPath = this.tplBaseDirConst + template;
+        String inputCfgPath = cfgProvider.defaultConfFilesDir + template;
         String cfgName = template.split("\\.")[0];
-        String filePath = GAMEFULLPATH + File.separator + cfgExportDirConst + File.separator + template.split("\\.")[0] + ".cfg";
-        Map<String, Object> configLines = new HashMap<>();
-         Map<String, Object> cfgFileContents = configLines = readJsonCfg(cfgProvider.class.getClassLoader().getResourceAsStream(inputCfgPath));
+        String absoluteCfgPath = cfgProvider.getFileAbsolutePath(cfgName);
+        Map<String, Object> configLines;
+        Map<String, Object> cfgFileContents = readJsonCfg(cfgProvider.class.getClassLoader().getResourceAsStream(inputCfgPath));
         if (external.equals(true)) {
-            
-            File fullFilePath = new File(filePath);
-            if(fullFilePath.exists()) {
-                 readNote = "    - Reading `" + cfgName + "` from external storage " + fullFilePath;
+            File absoluteFileCfgPath = new File(absoluteCfgPath);
+            if(absoluteFileCfgPath.exists()) {
+                 readNote = "    - Reading `" + cfgName + "` from external storage " + absoluteFileCfgPath;
             } else {
-                
-                 readNote = "    - Creating `" + cfgName + "` from inputStream " + fullFilePath;
-                 JsonWriter jsonWriter = new JsonWriter(new File(filePath), cfgFileContents);
-                 
+                 readNote = "    - Creating `" + absoluteCfgPath + "` from inputStream " + absoluteFileCfgPath;
+                 JsonWriter jsonWriter = new JsonWriter(new File(absoluteCfgPath), cfgFileContents); 
             }
-            configLines = readJsonCfg(new File(filePath));
-
+            configLines = readJsonCfg(new File(absoluteCfgPath));
         } else {
             readNote = "    - Reading `" + cfgName + "` from inputStream " + inputCfgPath;
             configLines = cfgFileContents;
-        
         }
         
-                if (configLines.get("debug") != null) {
-                    if ("true".equals(configLines.get("debug").toString())) {
-                        cfgProvider.DEBUG = true;
-                    }
+            if ("true".equals(debug)) {
                 System.out.println(readNote);
-                }
-        
-        
+            }
 
         cfgProvider.cfgMaps.put(cfgName, configLines);
     }
@@ -130,5 +112,29 @@ public class cfgProvider {
         }
 
         return map;
+    }
+    
+    private static String getFileAbsolutePath(String cfgName) {
+        return GAMEFULLPATH + File.separator + cfgExportDirName + File.separator + cfgName + ".cfg";
+    }
+    
+    public void setHomeDir(String homeDir){
+        cfgProvider.homeDirName = homeDir;
+    }
+    
+    public void setBaseDirPathIndex(int index){
+        cfgProvider.baseDirPath = getWorkdir(index);
+    }
+    
+    public void setDefaultConfFilesDir(String directory) {
+        cfgProvider.defaultConfFilesDir = directory;
+    }
+    
+    public void setCfgExportDirName(String dirName) {
+        cfgProvider.cfgExportDirName = dirName;
+    }
+    
+    public void setDebug(Boolean debug){
+        cfgProvider.debug = debug;
     }
 }
