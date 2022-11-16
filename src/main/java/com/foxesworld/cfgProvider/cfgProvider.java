@@ -7,9 +7,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
@@ -23,45 +22,45 @@ public class cfgProvider {
     
         private static String baseDirPath = getWorkdir((Integer) defaultConfig.get("baseDirIndex"));
         private static String homeDirName = (String) defaultConfig.get("homeDir");
+        private static String currentCfg;
         private static String defaultConfFilesDir = (String) defaultConfig.get("tplBaseDir");
         private static String cfgFileExtension = (String) defaultConfig.get("cfgExtension");
         private static String cfgExportDirName = (String) defaultConfig.get("cfgExportDir");
         private static Boolean debug = (Boolean) defaultConfig.get("debug");
 
     /*ENVIRONMENT PATHs*/
-    public final static String GAMEFULLPATH = baseDirPath + File.separator + cfgProvider.homeDirName + File.separator;
+    private final static String GAMEFULLPATH = baseDirPath + File.separator + cfgProvider.homeDirName + File.separator;
     private static String readNote;
     private static final Integer MONTH = Calendar.getInstance().get(Calendar.MONTH) + 1;
 
     /*OUTPUT*/
-    public static Map<String, Object> cfgContent = new HashMap<>();
-    public static Map<String, Map> cfgMaps = new HashMap<>();
+    private static Map<String, Object> configLines = new HashMap<>();
+    private static Map<String, Map> cfgMaps = new HashMap<>();
 
-    public cfgProvider(String template, Boolean external, String... args) {
+    public cfgProvider(String template) {
         String inputCfgPath = cfgProvider.defaultConfFilesDir + template;
-        String cfgName = template.split("\\.")[0];
-        String absoluteCfgPath = cfgProvider.getFileAbsolutePath(cfgName);
-        Map<String, Object> configLines;
         Map<String, Object> cfgFileContents = readJsonCfg(cfgProvider.class.getClassLoader().getResourceAsStream(inputCfgPath));
-        if (external.equals(true)) {
+        currentCfg = template.split("\\.")[0];
+        String absoluteCfgPath = getFileAbsolutePath(currentCfg);
+        
+        if(!template.contains("internal")){
             File absoluteFileCfgPath = new File(absoluteCfgPath);
             if(absoluteFileCfgPath.exists()) {
-                 readNote = "    - Reading `" + cfgName + "` from external storage " + absoluteFileCfgPath;
+                 readNote = "    - Reading `" + currentCfg + "` from external storage " + absoluteFileCfgPath;
             } else {
                  readNote = "    - Creating `" + absoluteCfgPath + "` from inputStream " + absoluteFileCfgPath;
                  JsonWriter jsonWriter = new JsonWriter(new File(absoluteCfgPath), cfgFileContents); 
             }
-            configLines = readJsonCfg(new File(absoluteCfgPath));
+            setConfigLines(readJsonCfg(new File(absoluteCfgPath)));
         } else {
-            readNote = "    - Reading `" + cfgName + "` from inputStream " + inputCfgPath;
-            configLines = cfgFileContents;
+            readNote = "    - Reading `" + currentCfg + "` from inputStream " + inputCfgPath;
+            setConfigLines(cfgFileContents);
         }
         
             if ("true".equals(debug)) {
                 System.out.println(readNote);
             }
-
-        cfgProvider.cfgMaps.put(cfgName, configLines);
+        putCfgMap();
     }
 
     private static String getWorkdir(Integer index) {
@@ -93,8 +92,7 @@ public class cfgProvider {
             TypeReference<HashMap<String, Object>> typeRef = new TypeReference<HashMap<String, Object>>() {
             };
             map = mapper.readValue(is, typeRef);
-        } catch (IOException ignored) {
-        }
+        } catch (IOException ignored) {}
 
         return map;
     }
@@ -106,15 +104,21 @@ public class cfgProvider {
         };
         try {
             map = mapper.readValue(path, typeRef);
-        } catch (IOException ex) {
-            Logger.getLogger(cfgProvider.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        } catch (IOException ex) {}
 
         return map;
     }
     
     private static String getFileAbsolutePath(String cfgName) {
         return GAMEFULLPATH + File.separator + cfgExportDirName + File.separator + cfgName + cfgFileExtension;
+    }
+    
+    private static void putCfgMap() {
+        cfgMaps.put(getCurrentCfgName(), getConfigLines());
+    }
+    
+    private static void setConfigLines(Map configLines){
+        cfgProvider.configLines = configLines;
     }
     
     public static void setHomeDir(String homeDir){
@@ -145,7 +149,27 @@ public class cfgProvider {
         return readNote;
     }
     
+    public static String getCurrentCfgName() {
+        return currentCfg;
+    }
+    
+    public static Map getConfigLines() {
+        return configLines;
+    }
+    
+    public static Map<String, Map> getAllCfgMaps() {
+        return cfgMaps;
+    }
+    
+    public static HashMap<String, List<Object>> getCfgMap(String mapName) {
+        return (HashMap<String, List<Object>>) cfgMaps.get(mapName);
+    }
+    
     public static Integer getMonth() {
         return MONTH;
+    }
+    
+    public static String getGameFullPath() {
+        return GAMEFULLPATH;
     }
 }

@@ -11,8 +11,8 @@ public class Test {
     private static Map testMap = null;
 
     public static void main(String[] args) {
-        test = new cfgProvider("test.json", true);
-        testMap = test.cfgMaps.get("test");
+        new cfgProvider("test.json");
+        testMap = cfgProvider.getCfgMap(cfgProvider.getCurrentCfgName());
         mapList();
     }
     
