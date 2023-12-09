@@ -1,34 +1,28 @@
 package com.foxesworld.cfgProvider;
 
-import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectWriter;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Map;
 
-/**
- *
- * @author AidenFox
- */
 public class JsonWriter {
-    
-    
-    public JsonWriter(File path,  Map<String, Object> cfgFileContent) {
-        if(!path.exists()) {
+
+    public JsonWriter(File path, Map<String, Object> cfgFileContent) {
+        if (!path.exists()) {
             path.getParentFile().mkdirs();
         }
         writeJson(path, cfgFileContent);
     }
-    
-    
-    private static void writeJson(File path, Map<String, Object> contents) {
- 
-    ObjectMapper mapper = new ObjectMapper();
-    ObjectWriter writer = mapper.writer(new DefaultPrettyPrinter());
-    try {  
-        writer.writeValue(path, contents);
-    } catch (IOException e) {}  
 
-  }  
+    private static void writeJson(File path, Map<String, Object> contents) {
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        try (FileWriter writer = new FileWriter(path)) {
+            gson.toJson(contents, writer);
+        } catch (IOException e) {
+            e.printStackTrace(); // Handle the exception according to your needs
+        }
+    }
 }

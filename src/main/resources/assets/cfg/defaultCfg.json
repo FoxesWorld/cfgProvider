@@ -1,8 +1,8 @@
 {
-    "baseDirIndex": 1,
-    "homeDir": "FoxesColonisation",
+    "baseDirIndex": 3,
+    "homeDir": ".FoxesWorld",
     "tplBaseDir": "assets/cfg/",
-    "cfgExportDir": "config/",
-    "cfgExtension": ".cfg",
+    "cfgExportDir": "config",
+    "cfgExtension": ".json",
     "debug": false
 }

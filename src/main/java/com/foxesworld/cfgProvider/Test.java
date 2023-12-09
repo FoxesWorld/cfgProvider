@@ -7,12 +7,12 @@ import java.util.Map;
  */
 public class Test {
 
-    private static cfgProvider test;
+    private static CfgProvider test;
     private static Map testMap = null;
 
     public static void main(String[] args) {
-        new cfgProvider("test.json");
-        testMap = cfgProvider.getCfgMap(cfgProvider.getCurrentCfgName());
+        test = new CfgProvider("test.json");
+        testMap = test.getCfgMap(CfgProvider.getCurrentCfgName());
         mapList();
     }
     
@@ -22,7 +22,7 @@ public class Test {
            inputArray = testMap.get(inputArrName);
              System.out.println(testMap.get(inputArrName));
          }
-         System.out.println(cfgProvider.getReadNote());
+         System.out.println(test.getReadNote());
     }
 
 }
