@@ -1,4 +1,4 @@
-package com.foxesworld.cfgProvider.defaultCfg;
+package org.foxesworld.cfgProvider.defaultCfg;
 
 import com.google.gson.Gson;
 

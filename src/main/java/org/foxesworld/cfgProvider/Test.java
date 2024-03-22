@@ -1,4 +1,4 @@
-package com.foxesworld.cfgProvider;
+package org.foxesworld.cfgProvider;
 
 import java.util.Map;
 
@@ -11,8 +11,8 @@ public class Test {
     private static Map testMap = null;
 
     public static void main(String[] args) {
-        test = new CfgProvider("test.json");
-        testMap = test.getCfgMap(CfgProvider.getCurrentCfgName());
+        new CfgProvider("test.json");
+        testMap = CfgProvider.getCfgMap(CfgProvider.getCurrentCfgName());
         mapList();
     }
     
@@ -22,7 +22,7 @@ public class Test {
            inputArray = testMap.get(inputArrName);
              System.out.println(testMap.get(inputArrName));
          }
-         System.out.println(test.getReadNote());
+         System.out.println(CfgProvider.getReadNote());
     }
 
 }
