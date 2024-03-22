@@ -28,7 +28,7 @@ public class JsonWriter {
     ObjectWriter writer = mapper.writer(new DefaultPrettyPrinter());
     try {  
         writer.writeValue(path, contents);
-    } catch (IOException e) {}  
+    } catch (IOException ignored) {}
 
   }  
 }

@@ -18,7 +18,7 @@ public class CfgProvider {
 
 
     /*ROOT cfg*/
-    private final static Map defaultConfig = readJsonCfg(CfgProvider.class.getClassLoader().getResourceAsStream("assets/cfg/defaultCfg.json"));
+    private final static Map<String, Object> defaultConfig = readJsonCfg(CfgProvider.class.getClassLoader().getResourceAsStream("assets/cfg/defaultCfg.json"));
     
         private static String baseDirPath = getWorkdir((Integer) defaultConfig.get("baseDirIndex"));
         private static String homeDirName = (String) defaultConfig.get("homeDir");
@@ -89,7 +89,7 @@ public class CfgProvider {
         HashMap<String, Object> map = null;
         try {
             ObjectMapper mapper = new ObjectMapper();
-            TypeReference<HashMap<String, Object>> typeRef = new TypeReference<HashMap<String, Object>>() {
+            TypeReference<HashMap<String, Object>> typeRef = new TypeReference<>() {
             };
             map = mapper.readValue(is, typeRef);
         } catch (IOException ignored) {}
@@ -100,7 +100,7 @@ public class CfgProvider {
     protected static HashMap<String, Object> readJsonCfg(File path) {
         HashMap<String, Object> map = null;
         ObjectMapper mapper = new ObjectMapper();
-        TypeReference<HashMap<String, Object>> typeRef = new TypeReference<HashMap<String, Object>>() {
+        TypeReference<HashMap<String, Object>> typeRef = new TypeReference<>() {
         };
         try {
             map = mapper.readValue(path, typeRef);
@@ -120,27 +120,27 @@ public class CfgProvider {
     private static void setConfigLines(Map configLines){
         CfgProvider.configLines = configLines;
     }
-    
+    @SuppressWarnings("unused")
     public static void setHomeDir(String homeDir){
         CfgProvider.homeDirName = homeDir;
     }
-    
+    @SuppressWarnings("unused")
     public static void setBaseDirPathIndex(int index){
         CfgProvider.baseDirPath = getWorkdir(index);
     }
-    
+    @SuppressWarnings("unused")
     public static void setDefaultConfFilesDir(String directory) {
         CfgProvider.defaultConfFilesDir = directory;
     }
-    
+    @SuppressWarnings("unused")
     public static void setCfgFileExtension(String extension) {
         CfgProvider.cfgFileExtension = extension;
     }
-    
+    @SuppressWarnings("unused")
     public static void setCfgExportDirName(String dirName) {
         CfgProvider.cfgExportDirName = dirName;
     }
-    
+    @SuppressWarnings("unused")
     public static void setDebug(Boolean debug){
         CfgProvider.debug = debug;
     }
@@ -156,7 +156,7 @@ public class CfgProvider {
     public static Map getConfigLines() {
         return configLines;
     }
-    
+    @SuppressWarnings("unused")
     public static Map<String, Map> getAllCfgMaps() {
         return cfgMaps;
     }
@@ -164,11 +164,12 @@ public class CfgProvider {
     public static HashMap<String, List<Object>> getCfgMap(String mapName) {
         return (HashMap<String, List<Object>>) cfgMaps.get(mapName);
     }
-    
+    @SuppressWarnings("unused")
     public static Integer getMonth() {
         return MONTH;
     }
-    
+
+    @SuppressWarnings("unused")
     public static String getGameFullPath() {
         return GAMEFULLPATH;
     }

@@ -1,5 +1,6 @@
 package org.foxesworld.cfgProvider;
 
+import javax.swing.*;
 import java.util.Map;
 
 /**
