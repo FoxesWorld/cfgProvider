@@ -86,24 +86,18 @@ public class CfgProvider {
         return path;
     }
 
-    protected static Map<String, Object> readJsonCfg(InputStream is) {
-        Map<String, Object> map = null;
-        try {
-            ObjectMapper mapper = new ObjectMapper();
-            TypeReference<HashMap<String, Object>> typeRef = new TypeReference<HashMap<String, Object>>() {};
-            map = mapper.readValue(is, typeRef);
-        } catch (IOException ignored) {
-        }
-        return map;
-    }
+    protected static Map<String, Object> readJsonCfg(Object source) {
+        Map<String, Object> map = new HashMap<>();
+        ObjectMapper mapper = new ObjectMapper();
+        TypeReference<HashMap<String, Object>> typeRef = new TypeReference<HashMap<String, Object>>() {};
 
-    protected static Map<String, Object> readJsonCfg(File path) {
-        Map<String, Object> map = null;
         try {
-            ObjectMapper mapper = new ObjectMapper();
-            TypeReference<HashMap<String, Object>> typeRef = new TypeReference<HashMap<String, Object>>() {};
-            map = mapper.readValue(path, typeRef);
-        } catch (IOException ex) {
+            if (source instanceof InputStream) {
+                map = mapper.readValue((InputStream) source, typeRef);
+            } else if (source instanceof File) {
+                map = mapper.readValue((File) source, typeRef);
+            }
+        } catch (IOException ignored) {
         }
         return map;
     }
@@ -168,7 +162,6 @@ public class CfgProvider {
         return new HashMap<>(cfgMaps);
     }
 
-    @SuppressWarnings("unchecked")
     public static Map getCfgMap(String mapName) {
         return cfgMaps.get(mapName);
     }
