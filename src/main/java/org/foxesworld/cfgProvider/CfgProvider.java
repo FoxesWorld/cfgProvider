@@ -21,7 +21,6 @@ public class CfgProvider {
     private static String cfgFileExtension;
     private static String cfgExportDirName;
     private static Boolean debug;
-
     private static final String GAMEFULLPATH;
     private static String readNote;
     private static final Integer MONTH;
@@ -53,7 +52,7 @@ public class CfgProvider {
             if (absoluteFileCfgPath.exists()) {
                 readNote = "    - Reading `" + currentCfg + "` from external storage " + absoluteFileCfgPath;
             } else {
-                readNote = "    - Creating `" + absoluteCfgPath + "` from inputStream " + absoluteFileCfgPath;
+                readNote = "    - Creating `" + absoluteCfgPath + "` from inputStream " + inputCfgPath;
                 JsonWriter jsonWriter = new JsonWriter(new File(absoluteCfgPath), cfgFileContents);
             }
             setConfigLines(readJsonCfg(new File(absoluteCfgPath)));
