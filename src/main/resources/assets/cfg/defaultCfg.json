@@ -3,6 +3,5 @@
     "homeDir": ".FoxesWorld",
     "tplBaseDir": "assets/cfg/",
     "cfgExportDir": "config",
-    "cfgExtension": ".cfg",
-    "debug": false
+    "cfgExtension": ".cfg"
 }

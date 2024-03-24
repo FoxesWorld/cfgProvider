@@ -2,6 +2,7 @@ package org.foxesworld.cfgProvider;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import org.apache.logging.log4j.core.Logger;
 
 import java.io.File;
 import java.io.IOException;
@@ -14,16 +15,14 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class CfgProvider {
-
     private static final Map<String, Object> defaultConfig;
-
+    public static Logger LOGGER;
     private static String baseDirPath;
     private static String homeDirName;
     private static String currentCfg;
     private static String defaultConfFilesDir;
     private static String cfgFileExtension;
     private static String cfgExportDirName;
-    private static Boolean debug;
     private static final String GAMEFULLPATH;
     private static String readNote;
     private static final Integer MONTH;
@@ -38,7 +37,6 @@ public class CfgProvider {
         defaultConfFilesDir = (String) defaultConfig.get("tplBaseDir");
         cfgFileExtension = (String) defaultConfig.get("cfgExtension");
         cfgExportDirName = (String) defaultConfig.get("cfgExportDir");
-        debug = (Boolean) defaultConfig.get("debug");
 
         GAMEFULLPATH = baseDirPath + File.separator + homeDirName;
         MONTH = Calendar.getInstance().get(Calendar.MONTH) + 1;
@@ -64,9 +62,7 @@ public class CfgProvider {
             setConfigLines(cfgFileContents);
         }
 
-        if (debug) {
-            System.out.println(readNote);
-        }
+        LOGGER.debug(readNote);
         putCfgMap();
     }
 
@@ -88,25 +84,6 @@ public class CfgProvider {
         }
         return path;
     }
-
-    /*
-    protected static Map<String, Object> readJsonCfg(Object source) {
-        Map<String, Object> map = new HashMap<>();
-        ObjectMapper mapper = new ObjectMapper();
-        TypeReference<HashMap<String, Object>> typeRef = new TypeReference<HashMap<String, Object>>() {};
-
-        try {
-            if (source instanceof InputStream) {
-                map = mapper.readValue((InputStream) source, typeRef);
-            } else if (source instanceof File) {
-                map = mapper.readValue((File) source, typeRef);
-            }
-        } catch (IOException ignored) {
-        }
-        return map;
-    }
-    */
-
     protected static Map<String, Object> readJsonCfg(InputStream source) {
         Map<String, Object> map = parseJson(source);
         return handleNumericValues(map);
@@ -145,9 +122,9 @@ public class CfgProvider {
             Object value = entry.getValue();
             if (value instanceof Double) {
                 // Convert Double to Integer if it's a whole number
-                Double doubleValue = (Double) value;
+                double doubleValue = (Double) value;
                 if (doubleValue == Math.floor(doubleValue)) {
-                    entry.setValue(doubleValue.intValue());
+                    entry.setValue((int) doubleValue);
                 }
             }
             // Handle nested maps recursively
@@ -196,11 +173,6 @@ public class CfgProvider {
         cfgExportDirName = dirName;
     }
 
-    @SuppressWarnings("unused")
-    public static void setDebug(Boolean debug) {
-        CfgProvider.debug = debug;
-    }
-
     public static String getReadNote() {
         return readNote;
     }
@@ -230,5 +202,9 @@ public class CfgProvider {
     @SuppressWarnings("unused")
     public static String getGameFullPath() {
         return GAMEFULLPATH;
+    }
+
+    public static void setLOGGER(Logger LOGGER) {
+        CfgProvider.LOGGER = LOGGER;
     }
 }
