@@ -1,11 +1,14 @@
 package org.foxesworld.cfgProvider;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.lang.reflect.Type;
+import java.net.URL;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
@@ -86,6 +89,7 @@ public class CfgProvider {
         return path;
     }
 
+    /*
     protected static Map<String, Object> readJsonCfg(Object source) {
         Map<String, Object> map = new HashMap<>();
         ObjectMapper mapper = new ObjectMapper();
@@ -98,6 +102,58 @@ public class CfgProvider {
                 map = mapper.readValue((File) source, typeRef);
             }
         } catch (IOException ignored) {
+        }
+        return map;
+    }
+    */
+
+    protected static Map<String, Object> readJsonCfg(InputStream source) {
+        Map<String, Object> map = parseJson(source);
+        return handleNumericValues(map);
+    }
+
+    protected static Map<String, Object> readJsonCfg(File source) {
+        Map<String, Object> map = parseJson(source);
+        return handleNumericValues(map);
+    }
+
+    private static Map<String, Object> parseJson(Object source) {
+        Map<String, Object> map = new HashMap<>();
+        Gson gson = new Gson();
+        Type type = new TypeToken<HashMap<String, Object>>(){}.getType();
+
+        try (InputStreamReader reader = new InputStreamReader(getInputStream(source))) {
+            map = gson.fromJson(reader, type);
+        } catch (IOException ignored) {
+        }
+        return map;
+    }
+
+    private static InputStream getInputStream(Object source) throws IOException {
+        if (source instanceof InputStream) {
+            return (InputStream) source;
+        } else if (source instanceof File) {
+            URL url = ((File) source).toURI().toURL();
+            return url.openStream();
+        } else {
+            throw new IllegalArgumentException("Invalid source type");
+        }
+    }
+
+    private static Map<String, Object> handleNumericValues(Map<String, Object> map) {
+        for (Map.Entry<String, Object> entry : map.entrySet()) {
+            Object value = entry.getValue();
+            if (value instanceof Double) {
+                // Convert Double to Integer if it's a whole number
+                Double doubleValue = (Double) value;
+                if (doubleValue == Math.floor(doubleValue)) {
+                    entry.setValue(doubleValue.intValue());
+                }
+            }
+            // Handle nested maps recursively
+            if (value instanceof Map) {
+                entry.setValue(handleNumericValues((Map<String, Object>) value));
+            }
         }
         return map;
     }
