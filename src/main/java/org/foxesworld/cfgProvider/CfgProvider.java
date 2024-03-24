@@ -2,7 +2,7 @@ package org.foxesworld.cfgProvider;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import org.apache.logging.log4j.core.Logger;
+import org.apache.logging.log4j.Logger;
 
 import java.io.File;
 import java.io.IOException;
@@ -51,14 +51,14 @@ public class CfgProvider {
         if (!template.contains("internal")) {
             File absoluteFileCfgPath = new File(absoluteCfgPath);
             if (absoluteFileCfgPath.exists()) {
-                readNote = "    - Reading `" + currentCfg + "` from external storage " + absoluteFileCfgPath;
+                readNote = "Reading `" + currentCfg + "` from external storage " + absoluteFileCfgPath;
             } else {
-                readNote = "    - Creating `" + absoluteCfgPath + "` from inputStream " + inputCfgPath;
+                readNote = "Creating `" + absoluteCfgPath + "` from inputStream " + inputCfgPath;
                 JsonWriter jsonWriter = new JsonWriter(new File(absoluteCfgPath), cfgFileContents);
             }
             setConfigLines(readJsonCfg(new File(absoluteCfgPath)));
         } else {
-            readNote = "    - Reading `" + currentCfg + "` from inputStream " + inputCfgPath;
+            readNote = "Reading `" + currentCfg + "` from inputStream " + inputCfgPath;
             setConfigLines(cfgFileContents);
         }
 
